@@ -1,7 +1,7 @@
-all: hello.o
-	ld hello.o -o hello
+all: cp.o
+	ld cp.o -o hello
 
-hello.o: hello.asm
-	nasm -f ELF hello.asm
+cp.o: cp.asm
+	nasm -f ELF cp.asm
 
 	
