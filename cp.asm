@@ -1,6 +1,7 @@
 ;copies a file
 ;equivalent to what tee does, should investigate fsync and close
 ;all registers besides eax are preserved
+;implement error checking...
 %define BUFFER_SIZE 1024 ; size in bytes
 section .text
 	global main
@@ -51,18 +52,16 @@ section .text
 	mov eax, 3 ; read
 	mov ebx, [ifd]
 	mov ecx, buf
-
 	mov edx, BUFFER_SIZE
 	int 80h	
-		
-	mov edx, eax ; length read
-	mov esi, edx ;save length of buffer for later
-	mov eax, 4 ;write 
+
+	mov edx, eax ; length of read	
+	mov eax, 4 ; write 
 	mov ebx, 1 ; stdout
 	int 80h
 
-	mov ebx, [ofd] ;restore file descriptor
-	mov edx, esi; restore size written
+	; edx is set up for us from the last call
+	mov ebx, [ofd] ;restore file descriptor	
 	mov ecx, buf ; write the buffer
 	mov eax, 4 ; write
 	int 80h
@@ -75,9 +74,9 @@ section .text
 	mov eax, 1 ; exit
 	int 80h
 
-section .data	
+section .data
 	mode equ 2q | 100q ; O_RDWR and CREATE permission
 	ifd dd 0 ; input file descriptor
 	ofd dd 0 ; output file descriptor
 section .bss
-	buf resb BUFFER_SIZE	
+	buf resb BUFFER_SIZE
